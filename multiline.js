@@ -47,7 +47,7 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
     chartObj.xFormatter = chartObj.formatAsNumber;
     chartObj.yFormatter = chartObj.formatAsFloat;
 
-    chartObj.bisectYear = d3.bisector(chartObj.xFunct).left; //< Can be overridden in definition
+    chartObj.bisectTime = d3.bisector(chartObj.xFunct).left; //< Can be overridden in definition
 
 //Create scale functions
     chartObj.xScale = d3.scale.linear().range([0, chartObj.width]).domain(d3.extent(chartObj.data, chartObj.xFunct)); //< Can be overridden in definition
@@ -58,7 +58,7 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
     };
     chartObj.yScale = d3.scale.linear().range([chartObj.height, 0]).domain([0, d3.max(chartObj.yFuncts.map(chartObj.max))]);
 
-    chartObj.formatAsYear = d3.format("");
+    chartObj.formatAsTime = d3.format("");
 
 //Create axis
     chartObj.xAxis = d3.svg.axis().scale(chartObj.xScale).orient("bottom").tickFormat(chartObj.xFormatter); //< Can be overridden in definition
@@ -112,16 +112,16 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
         return chartObj;
     };
 
-    chartObj.bind = function (selector) {
-        chartObj.mainDiv = d3.select(selector);
-        // Add all the divs to make it centered and responsive
-        chartObj.mainDiv.append("div").attr("class", "inner-wrapper").append("div").attr("class", "outer-box").append("div").attr("class", "inner-box");
-        chartSelector = selector + " .inner-box";
-        chartObj.chartDiv = d3.select(chartSelector);
-        d3.select(window).on('resize.' + chartSelector, chartObj.update_svg_size);
-        chartObj.update_svg_size();
-        return chartObj;
-    };
+chartObj.bind = function (selector) {
+      chartObj.mainDiv = d3.select(selector);
+      // Add all the divs to make it centered and responsive
+      chartObj.mainDiv.append("div").attr("class", "inner-wrapper").append("div").attr("class", "outer-box").append("div").attr("class", "inner-box");
+      chartSelector = selector + " .inner-box";
+      chartObj.chartDiv = d3.select(chartSelector);
+      d3.select(window).on('resize.' + chartSelector, chartObj.update_svg_size);
+      chartObj.update_svg_size();
+      return chartObj;
+};
 
 // Render the chart
     chartObj.render = function () {
@@ -136,12 +136,58 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
                 focus.transition().delay(700).style("display", "none");
             }).on("mousemove", mousemove);
         }
-
-
         // Draw Axis
         chartObj.svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + chartObj.height + ")").call(chartObj.xAxis).append("text").attr("class", "label").attr("x", chartObj.width / 2).attr("y", 30).style("text-anchor", "middle").text(chartObj.xAxisLable);
 
         chartObj.svg.append("g").attr("class", "y axis").call(chartObj.yAxis).append("text").attr("class", "label").attr("transform", "rotate(-90)").attr("y", -42).attr("x", -chartObj.height / 2).attr("dy", ".71em").style("text-anchor", "middle").text(chartObj.yAxisLable);
 
-   return chartObj;
+        //Draw tooltips
+        var focus = chartObj.svg.append("g").attr("class", "focus").style("display", "none");
+
+        for (var y  in yObjs) {
+            yObjs[y].tooltip = focus.append("g");
+            yObjs[y].tooltip.append("circle").attr("r", 5);
+            yObjs[y].tooltip.append("rect").attr("x", 8).attr("y","-5").attr("width",22).attr("height",'0.75em');
+            yObjs[y].tooltip.append("text").attr("x", 9).attr("dy", ".35em");
+        }
+
+        // Time label
+        focus.append("text").attr("class", "focus Time").attr("x", 9).attr("y", 7);
+        // Focus line
+        focus.append("line").attr("class", "focus line").attr("y1", 0).attr("y2", chartObj.height);
+
+        //Draw legend
+        var legend = chartObj.mainDiv.append('div').attr("class", "legend");
+        for (var y  in yObjs) {
+            series = legend.append('div');
+            series.append('div').attr("class", "series-marker").style("background-color", color(y));
+            series.append('p').text(y);
+            yObjs[y].legend = series;
+        }
+        // Overlay to capture hover
+        chartObj.svg.append("rect").attr("class", "overlay").attr("width", chartObj.width).attr("height", chartObj.height).on("mouseover", function () {
+            focus.style("display", null);
+        }).on("mouseout", function () {
+            focus.style("display", "none");
+        }).on("mousemove", mousemove);
+
+        return chartObj;
+        function mousemove() {
+            var x0 = chartObj.xScale.invert(d3.mouse(this)[0]), i = chartObj.bisectTime(dataset, x0, 1), d0 = chartObj.data[i - 1], d1 = chartObj.data[i];
+            try {
+                var d = x0 - chartObj.xFunct(d0) > chartObj.xFunct(d1) - x0 ? d1 : d0;
+            } catch (e) { return;}
+            minY = chartObj.height;
+            for (var y  in yObjs) {
+                yObjs[y].tooltip.attr("transform", "translate(" + chartObj.xScale(chartObj.xFunct(d)) + "," + chartObj.yScale(yObjs[y].yFunct(d)) + ")");
+                yObjs[y].tooltip.select("text").text(chartObj.yFormatter(yObjs[y].yFunct(d)));
+                minY = Math.min(minY, chartObj.yScale(yObjs[y].yFunct(d)));
+            }
+
+            focus.select(".focus.line").attr("transform", "translate(" + chartObj.xScale(chartObj.xFunct(d)) + ")").attr("y1", minY);
+            focus.select(".focus.time").text("Time: " + chartObj.xFormatter(chartObj.xFunct(d)));
+        }
+
+    };
+    return chartObj;
 }

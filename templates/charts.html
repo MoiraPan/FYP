@@ -3,47 +3,64 @@
 <head>
    <meta charset="utf-8">
    <title>Visualized Indoor Occupancy Detection System</title>
-   <script src="https://d3js.org/d3.v4.min.js"></script>
+   <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+   <!--<script src="https://d3js.org/d3.v3.min.js"></script>
+    <style> /* set the CSS */
+        body { font: 12px Arial;}
+
+        path {
+            stroke: steelblue;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: grey;
+            stroke-width: 1;
+            shape-rendering: crispEdges;
+        }
+    </style>-->
 </head>
 
 <body>
+    <h1><center>Web Portal for Data Visualization testing</center></h1>
+
     <div id="chartContainer">
-        <h1><center>Web Portal for Data Visualization testing</center></h1>
-        <canvas id="chart_1" width="800" height="300"></canvas> data source: <input name="number"></input>
+        <canvas id="chart_1" width="800" height="300"></canvas> data source: <input name="number">
         <br>
         <canvas id="chart_2" width="800" height="300"></canvas>
-
         <br>
-        Occupied by Humans: <input autocomplete="off" id="occupied" type="text" readonly="readonly" value="Yes" />
+        Occupied by Humans: <input autocomplete="off" id="occupied" type="text" readonly="readonly" value="Yes" >
     </div>
-    
-    <div id="chart"></div>
-    <script src="script.js"></script>
-<!--    
+
+    <div id="chart1"></div>
+
     <script src="multiline.js" charset="utf-8"></script>
-    <script type="text/javascript">
-    d3.csv('/data/data_stored.csv', function(error, data) {
-    data.forEach(function (d) {
-        d.time = +d.time;
-        d.data1 = +d.data1;
-        d.data2 = +d.data2;
-        d.data3 = +d.data3;
-        d.data4 = +d.data4;
-        d.data5 = +d.data5;
-    });
 
-    var chart = makeLineChart(data, 'time', {
-        'data1': {column: 'data1'},
-        'data2': {column: 'data2'},
-        'data3': {column: 'data3'},
-        'data4': {column: 'data4'}
-    }, {xAxis: 'Time', yAxis: 'Value'});
-    chart.bind("#chart");
-    chart.render();
 
-    });
+<!--
+    <script>
+
+        d3.csv("/data/data_stored.csv")
+            .row(function(d){ return { time:parseTime(d.time),source:d.source1};})
+            .get(function(error,data){
+
+              var height = 400;
+              var width = 600;
+
+              var maxValue = d3.max(data,function(d){ return d.source1; });
+              var maxTime = d3.max(data,function(d){ return d.time; });
+              var minTime = d3.min(data,function(d){ return d.time; });
+              console.log(maxValue);
+              console.log(maxTime);
+              console.log(minTime);
+            })
+
     </script>
--->
+
+   <script src="script.js"></script>
     <script>
     var lineArr = [];
     var MAX_LENGTH = 100;
@@ -98,6 +115,6 @@
       d3.select(window).on('resize', resize);
     });
     </script>
-
+-->
 </body>
 </html>
