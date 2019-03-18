@@ -90,7 +90,7 @@ d3.csv("/data", function(error, data) {
 
 
 //update chart upon input change
-function updatechart() {
+function updatechart(data) {
 
     var sourceno = document.getElementById("source").value;
     var datashown = "source" + sourceno;
@@ -136,3 +136,12 @@ function updatechart() {
  updatechart();
  }, 500);
 
+ $(document).ready(function() {
+    namespace = '/data';
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+    socket.on('server_response', function(res) {
+        updatechart(data);
+    });
+
+});
