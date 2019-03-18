@@ -32,7 +32,7 @@ var svg = d3.select("#chart1")
               "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-d3.csv("/data/data_stored.csv", function(error, data) {
+d3.csv("/data", function(error, data) {
 
     data.forEach(function(d) {
         d.time = parseTime(d.time.toString());
@@ -101,13 +101,15 @@ function updatechart() {
         .y(function(d) { return y(d[datashown]); });
 
     // Get the data again
-    d3.csv("/data/data_stored.csv", function(error, data) {
-
+    d3.csv("/data", function(error, data) {
      	data.forEach(function(d) {
     	d.time = parseTime(d.time.toString());
     	d.source = parseInt(d[datashown]);
       //console.log(d.source);
     });
+    
+    var length = Math.min(data.length, 50);
+    data = data.slice(-length);
 
     // Scale the range of the data again
     x.domain(d3.extent(data, function(d) { return d.time; }));
@@ -134,6 +136,3 @@ function updatechart() {
  updatechart();
  }, 500);
 
-//limit data points
-var today = new Date();
-var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
