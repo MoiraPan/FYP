@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+Input: <input type="text" id="source" value="1">
+<div id="chart"></div>
+<style> /* set the CSS */
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+</style>
+ <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+<body>
+
+<!-- load the d3.js library -->    	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%H:%m:%s");
+
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+
+
+function updateData(newData, hasOld) {
+	// Removes the old chart.
+	if (hasOld) {
+		d3.select("svg").remove();
+	}
+
+	// format the data
+	newData.forEach(function(d) {
+	  d.date = parseTime(d.time);
+		d.value1 = +d.data[0][source];
+		d.value2 = +d.data[1][source];
+		d.value3 = +d.data[2][source];
+		d.max = Math.max(d.value1,d.value2,d.value3);
+	});
+
+	// append the svg obgect to the body of the page
+	// appends a 'group' element to 'svg'
+	// moves the 'group' element to the top left margin
+	var svg = d3.select("#chart").append("svg")
+		.datum(newData)
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform",
+	          "translate(" + margin.left + "," + margin.top + ")");
+
+	// Scale the range of the data
+	x.domain(d3.extent(newData, function(d) { return d.date; }));
+	y.domain([0, d3.max(newData, function(d) { return d.max; })]);
+
+	// define the line
+	var valueline1 = d3.line()
+			.x(function(d) { return x(d.date); })
+			.y(function(d) { return y(d.value1); });
+			
+	var valueline2 = d3.line()
+			.x(function(d) { return x(d.date); })
+			.y(function(d) { return y(d.value2); });
+			
+	var valueline3 = d3.line()
+			.x(function(d) { return x(d.date); })
+			.y(function(d) { return y(d.value3); });
+
+	// Add the valueline path.
+	svg.append("path")
+	  .data([newData])
+	  .attr("class", "line")
+		.attr("d", valueline1);
+		
+	svg.append("path")
+	  .data([newData])
+	  .attr("class", "line")
+	  .attr("d", valueline2);
+
+	svg.append("path")
+	  .data([newData])
+	  .attr("class", "line")
+	  .attr("d", valueline3);
+
+	xAxis = d3.axisBottom(x);
+	yAxis = d3.axisLeft(y);
+
+	// Add the X Axis
+	svg.append("g")
+	  .attr("transform", "translate(0," + height + ")")
+	  .call(xAxis);
+
+	// Add the Y Axis
+	svg.append("g")
+	  .call(yAxis);
+}
+
+
+// const oldData = [
+// 	{ date: '21:17:21', close: 99.55 },
+// 	{ date: '21:17:23', close: 45.67 },
+// ];
+
+// const newData = [
+// 	{ date: '21:17:21', close: 99.55 },
+// 	{ date: '21:17:23', close: 45.67 },
+// 	{ date: '21:17:25', close: 33.87 },
+// 	{ date: '21:17:27', close: 36.54 },
+// 	{ date: '21:17:29', close: 101.2 },
+// 	{ date: '21:17:31', close: 13.22 },
+// ];
+
+// updateData(oldData, false);
+// setTimeout(() => {
+// 	updateData(newData, true);
+// }, 1000);
+
+var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test");
+
+const data = [];
+const currentIndex = 0;
+const limit = 100;
+var source = document.getElementById("source").value;
+
+socket.on('server_response', res => {
+    data.push(res);
+    updateData(data, true);
+});
+</script>
+</body>
