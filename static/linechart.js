@@ -1,7 +1,18 @@
+//generate data
+// var jsonDataArray = []
+// for(var i=0; i<=6;i++){
+//     var obj = {};
+//     var jsondata = nj.random([3,114]);
+//     obj[Date.now()] = jsondata.selection.data
+//     jsonDataArray.push(obj);
+// }
+// console.log(jsonDataArray);
+
+
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
+width = 600 - margin.left - margin.right,
+height = 270 - margin.top - margin.bottom;
 
 // Parse the date / time
 var parseTime = d3.time.format("%H:%M:%S").parse;
@@ -12,136 +23,151 @@ var y = d3.scale.linear().range([height, 0]);
 
 // Define the axes
 var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
+.orient("bottom").ticks(5);
 
 var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
-
-// Define the line
-var valueline = d3.svg.line()
-    .x(function(d) { return x(d.time); })
-    .y(function(d) { return y(d.source1); });
+.orient("left").ticks(5);
 
 // Adds the svg canvas
 var svg = d3.select("#chart1")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
+.append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+.append("g")
+    .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
 
-// Get the data
-d3.csv("/data", function(error, data) {
+// Add the X Axis
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
 
-    data.forEach(function(d) {
-        d.time = parseTime(d.time.toString());
-        d.source = parseInt(d.source1);
-        //console.log(d.source);
-        //d.source1 = +d.source1;
-    });
+// Add the Y Axis
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
 
+function draw(data, source) {
+    
+    // Define the lines
+    var valueline = d3.svg.line()
+        .x(function(d) { return x(parseTime(d.time)); })
+        .y(function(d) { return y(d.data[0][source]); });
+
+    var valueline2 = d3.svg.line()
+        .x(function(d) { return x(parseTime(d.time)); })
+        .y(function(d) { return y(d.data[1][source]); });
+
+    var valueline3 = d3.svg.line()
+        .x(function(d) { return x(parseTime(d.time)); })
+        .y(function(d) { return y(d.data[2][source]); });
+    
     // Scale the range of the data
     x.domain(d3.extent(data, function(d) { return d.time; }));
-    y.domain([0, d3.max(data, function(d) { return d.source; })]);
-    //console.log(data);
-
-    // Add the valueline path.
+    y.domain([0, d3.max(data, function(d) { return d.data[0][source]; })]);
+    
+    // Add the valueline path1
     svg.append("path")
+        .data(data)
         .attr("class", "line")
         .attr("d", valueline(data));
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-/*
-    now = new Date()
-    // Shift domain
-    x.domain([now - (limit - 2) * duration, now - duration])
-
-    // Slide x-axis left
-    axis.transition()
-        .duration(duration)
-        .ease('linear')
-        .call(x.axis)
-
-    // Slide paths left
-    paths.attr('transform', null)
-        .transition()
-        .duration(duration)
-        .ease('linear')
-        .attr('transform', 'translate(' + x(now - (limit - 1) * duration) + ')')
-        .each('end', tick)
-
-    // Remove oldest data point from each group
-    //for (var name in groups) {
-    //    var group = groups[name]
-    //    group.data.shift()
-    //}
-*/
-});
-
-
-//update chart upon input change
-function updatechart(data) {
-
-    var sourceno = document.getElementById("source").value;
-    var datashown = "source" + sourceno;
-
-    // Define the line
-    var valueline = d3.svg.line()
-        .x(function(d) { return x(d.time); })
-        .y(function(d) { return y(d[datashown]); });
-
-    // Get the data again
-    d3.csv("/data", function(error, data) {
-     	data.forEach(function(d) {
-    	d.time = parseTime(d.time.toString());
-    	d.source = parseInt(d[datashown]);
-      //console.log(d.source);
-    });
-    
-    var length = Math.min(data.length, 50);
-    data = data.slice(-length);
-
-    // Scale the range of the data again
-    x.domain(d3.extent(data, function(d) { return d.time; }));
-    y.domain([0, d3.max(data, function(d) { return d.source; })]);
+    // Add the valueline path2
+    svg.append("path")
+        .data(data)
+        .attr("class", "line")
+        .attr("d", valueline2(data)); 
+        
+    // Add the valueline path3
+    svg.append("path")
+        .data(data)
+        .attr("class", "line")
+        .attr("d", valueline3(data));  
 
     // Select the section we want to apply our changes to
-    var svg = d3.select("#chart1").transition();
+    var svg2 = d3.select("#chart1").transition();
 
     //console.log(data);
     // Make the changes
-      svg.select(".line")   // change the line
-          .duration(750)
+      svg2.select(".line")   // change the line
           .attr("d", valueline(data));
-      svg.select(".x.axis") // change the x axis
-          .duration(750)
+      svg2.select(".x.axis") // change the x axis
           .call(xAxis);
-      svg.select(".y.axis") // change the y axis
-          .duration(750)
-          .call(yAxis);
-    });
+      svg2.select(".y.axis") // change the y axis
+          .call(yAxis);    
+}
+   
 
- }
- setInterval(function() {
- updatechart();
- }, 500);
+// /*
+//     now = new Date()
+//     // Shift domain
+//     x.domain([now - (limit - 2) * duration, now - duration])
 
- $(document).ready(function() {
-    namespace = '/data';
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+//     // Slide x-axis left
+//     axis.transition()
+//         .duration(duration)
+//         .ease('linear')
+//         .call(x.axis)
 
-    socket.on('server_response', function(res) {
-        updatechart(data);
-    });
+//     // Slide paths left
+//     paths.attr('transform', null)
+//         .transition()
+//         .duration(duration)
+//         .ease('linear')
+//         .attr('transform', 'translate(' + x(now - (limit - 1) * duration) + ')')
+//         .each('end', tick)
 
+//     // Remove oldest data point from each group
+//     //for (var name in groups) {
+//     //    var group = groups[name]
+//     //    group.data.shift()
+//     //}
+// */
+// });
+
+
+// //update chart upon input change
+// function updatechart(data) {
+
+//     var sourceno = document.getElementById("source").value;
+//     var datashown = "source" + sourceno;
+
+//     // Define the line
+//     var valueline = d3.svg.line()
+//         .x(function(d) { return x(d.time); })
+//         .y(function(d) { return y(d[datashown]); });
+
+//     // Get the data again
+//     d3.csv("/data", function(error, data) {
+//      	data.forEach(function(d) {
+//     	d.time = parseTime(d.time.toString());
+//     	d.source = parseInt(d[datashown]);
+//       //console.log(d.source);
+//     });
+    
+//     var length = Math.min(data.length, 50);
+//     data = data.slice(-length);
+
+//     // Scale the range of the data again
+//     x.domain(d3.extent(data, function(d) { return d.time; }));
+//     y.domain([0, d3.max(data, function(d) { return d.source; })]);
+
+
+//     });
+
+//  }
+
+// });
+
+var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test");
+console.log('http:' + '//' + document.domain + ':' + location.port + "/test");
+
+const data = [];
+const currentIndex = 0;
+const limit = 100;
+socket.on('server_response', res => {
+    data.push(res);
+    var source = document.getElementById("source").value;
+    draw(data, source);
 });
