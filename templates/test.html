@@ -23,19 +23,22 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
     height = 500 - margin.top - margin.bottom;
 
 // parse the date / time
-var parseTime = d3.timeParse("%H:%m:%s");
+var parseTime = d3.timeParse("%H:%M:%S");
 
 // set the ranges
 var x = d3.scaleTime().range([0, width]);
 var y = d3.scaleLinear().range([height, 0]);
 
+function updateData(data, hasOld) {
+	
+	var source = parseInt(document.getElementById("source").value);
 
-
-function updateData(newData, hasOld) {
 	// Removes the old chart.
 	if (hasOld) {
 		d3.select("svg").remove();
 	}
+
+	var newData = data.slice(-50);
 
 	// format the data
 	newData.forEach(function(d) {
@@ -128,7 +131,6 @@ var socket = io.connect('http:' + '//' + document.domain + ':' + location.port +
 const data = [];
 const currentIndex = 0;
 const limit = 100;
-var source = document.getElementById("source").value;
 
 socket.on('server_response', res => {
     data.push(res);

@@ -30,7 +30,7 @@ def background_thread():
     #while True:
         #generate
         #time.sleep(time_step)
-        value = np.random.random_sample((3,2))
+        value = np.random.random_sample((3,114))
         # print("breakpoint2")
         # print(value)
         s.sendto(json.dumps(value.tolist()).encode(), (UDP_IP, UDP_PORT))
@@ -39,7 +39,7 @@ def background_thread():
         socketio.sleep(time_step)
         # print("breakpoint3")
         t = time.strftime("%H:%M:%S")
-        data, addr = s.recvfrom(1024)
+        data, addr = s.recvfrom(16384)
         arr = json.loads(data)
         # print(arr)
         # d = np.frombuffer(data, dtype='float64').reshape((3,2))
