@@ -3,7 +3,7 @@
 <style> /* set the CSS */
 	.line {
 		fill: none;
-		stroke: steelblue;
+		/* stroke: steelblue; */
 		stroke-width: 2px;
 	}
 
@@ -20,10 +20,25 @@
 <!-- load the d3.js library -->    	
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
+//add style elements
+var lineOpacity = "0.25";
+var lineOpacityHover = "0.85";
+var otherLinesOpacityHover = "0.1";
+var lineStroke = "1.5px";
+var lineStrokeHover = "2.5px";
+
+var circleOpacity = '0.85';
+var circleOpacityOnLineHover = "0.25"
+var circleRadius = 3;
+var circleRadiusHover = 6;
+
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
 // set the dimensions and margins of the graph
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+		height = 500 - margin.top - margin.bottom;
+		
 
 // parse the date / time
 var parseTime = d3.timeParse("%H:%M:%S");
@@ -70,31 +85,41 @@ function updateData(data, hasOld) {
 	// define the line
 	var valueline1 = d3.line()
 			.x(function(d) { return x(d.date); })
-			.y(function(d) { return y(d.value1); });
+			.y(function(d) { return y(d.value1); })
+			.curve(d3.curveMonotoneX);
 			
 	var valueline2 = d3.line()
 			.x(function(d) { return x(d.date); })
-			.y(function(d) { return y(d.value2); });
+			.y(function(d) { return y(d.value2); })
+			.curve(d3.curveMonotoneX);
 			
 	var valueline3 = d3.line()
 			.x(function(d) { return x(d.date); })
-			.y(function(d) { return y(d.value3); });
+			.y(function(d) { return y(d.value3); })
+			.curve(d3.curveMonotoneX);
 
 	// Add the valueline path.
 	svg.append("path")
 	  .data([newData])
 	  .attr("class", "line")
-		.attr("d", valueline1);
+		.attr("d", valueline1)
+		.style('stroke', 'orange')
+  	.style('opacity', lineOpacity)
 		
 	svg.append("path")
 	  .data([newData])
 	  .attr("class", "line")
-	  .attr("d", valueline2);
+		.attr("d", valueline2)
+		.style('stroke', 'steelblue')
+  	.style('opacity', lineOpacity)
+
 
 	svg.append("path")
 	  .data([newData])
 	  .attr("class", "line")
-	  .attr("d", valueline3);
+		.attr("d", valueline3)
+		.style('stroke', 'green')
+  	.style('opacity', lineOpacity)
 
 	xAxis = d3.axisBottom(x);
 	yAxis = d3.axisLeft(y);
@@ -106,7 +131,8 @@ function updateData(data, hasOld) {
 
 	// Add the Y Axis
 	svg.append("g")
-	  .call(yAxis);
+		.call(yAxis);
+		
 }
 
 var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
