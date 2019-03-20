@@ -37,7 +37,7 @@ var color = d3.scaleOrdinal(d3.schemeCategory10);
 // set the dimensions and margins of the graph
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
-		height = 500 - margin.top - margin.bottom;
+		height = 600 - margin.top - margin.bottom;
 		
 
 // parse the date / time
@@ -132,7 +132,22 @@ function updateData(data, hasOld) {
 	// Add the Y Axis
 	svg.append("g")
 		.call(yAxis);
+
+	svg.append("text")
+		.attr("class", "x label")
+		.attr("text-anchor", "end")
+		.attr("x", width)
+		.attr("y", height -6)
+		.text("Time");
 		
+	svg.append("text")
+		.attr("class", "y label")
+		.attr("text-anchor", "end")
+		.attr("y", 6)
+		.attr("dy", ".75em")
+		.attr("transform", "rotate(0)")
+		.text("Amplitude");
+
 }
 
 var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {

@@ -12,7 +12,7 @@ from flask_socketio import SocketIO
 UDP_IP = "192.168.1.106"
 UDP_PORT = 6666
 addr = (UDP_IP, UDP_PORT)
-time_step = 1
+time_step = 3
  
 async_mode = None
 app = Flask(__name__)
