@@ -9,10 +9,10 @@ from threading import Lock
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
-UDP_IP = "172.31.104.119"
+UDP_IP = "192.168.1.106"
 UDP_PORT = 6666
 addr = (UDP_IP, UDP_PORT)
-time_step = 3
+time_step = 1
  
 async_mode = None
 app = Flask(__name__)
@@ -27,9 +27,9 @@ def background_thread():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     s.bind((UDP_IP, UDP_PORT))
     for t in range(24 * 3600 // time_step):
-    #while True:
+    # while True:
         #generate
-        #time.sleep(time_step)
+        # time.sleep(time_step)
         value = np.random.random_sample((3,114))
         # print("breakpoint2")
         # print(value)

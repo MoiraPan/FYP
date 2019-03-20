@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-Input: <input type="text" id="source" value="1">
-<div id="chart"></div>
 <style> /* set the CSS */
-
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
-}
+	.line {
+		fill: none;
+		stroke: steelblue;
+		stroke-width: 2px;
+	}
 
 </style>
- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+ <!-- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script> -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <body>
+	Input source1: <input type="text" class="source" id="source1" value="1">
+	Input source2: <input type="text" class="source" id="source2" value="1">
+	Input source3: <input type="text" class="source" id="source3" value="1">
+	<div class="chart" id="chart"></div><br>
+	<div class="chart" id="analysischart"></div>
 
 <!-- load the d3.js library -->    	
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -31,7 +34,9 @@ var y = d3.scaleLinear().range([height, 0]);
 
 function updateData(data, hasOld) {
 	
-	var source = parseInt(document.getElementById("source").value);
+	var source1 = parseInt(document.getElementById("source1").value);
+	var source2 = parseInt(document.getElementById("source2").value);
+	var source3 = parseInt(document.getElementById("source3").value);
 
 	// Removes the old chart.
 	if (hasOld) {
@@ -43,15 +48,13 @@ function updateData(data, hasOld) {
 	// format the data
 	newData.forEach(function(d) {
 	  d.date = parseTime(d.time);
-		d.value1 = +d.data[0][source];
-		d.value2 = +d.data[1][source];
-		d.value3 = +d.data[2][source];
+		d.value1 = +d.data[0][source1];
+		d.value2 = +d.data[1][source2];
+		d.value3 = +d.data[2][source3];
 		d.max = Math.max(d.value1,d.value2,d.value3);
 	});
 
 	// append the svg obgect to the body of the page
-	// appends a 'group' element to 'svg'
-	// moves the 'group' element to the top left margin
 	var svg = d3.select("#chart").append("svg")
 		.datum(newData)
 	    .attr("width", width + margin.left + margin.right)
@@ -106,31 +109,16 @@ function updateData(data, hasOld) {
 	  .call(yAxis);
 }
 
-
-// const oldData = [
-// 	{ date: '21:17:21', close: 99.55 },
-// 	{ date: '21:17:23', close: 45.67 },
-// ];
-
-// const newData = [
-// 	{ date: '21:17:21', close: 99.55 },
-// 	{ date: '21:17:23', close: 45.67 },
-// 	{ date: '21:17:25', close: 33.87 },
-// 	{ date: '21:17:27', close: 36.54 },
-// 	{ date: '21:17:29', close: 101.2 },
-// 	{ date: '21:17:31', close: 13.22 },
-// ];
-
-// updateData(oldData, false);
-// setTimeout(() => {
-// 	updateData(newData, true);
-// }, 1000);
-
-var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test");
+var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
+    'reconnection': true,
+    'reconnectionDelay': 1000,
+    'reconnectionDelayMax' : 5000,
+    'reconnectionAttempts': 5
+});
 
 const data = [];
-const currentIndex = 0;
-const limit = 100;
+// const currentIndex = 0;
+// const limit = 100;
 
 socket.on('server_response', res => {
     data.push(res);
