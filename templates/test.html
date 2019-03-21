@@ -1,41 +1,50 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style> /* set the CSS */
-	.line {
-		fill: none;
-		/* stroke: steelblue; */
-		stroke-width: 2px;
-	}
+<head>
+	<meta charset="utf-8">
+	<title>Indoor Occupancy Detection Visualization</title>
+	<style> /* set the CSS */
+		.line {
+			fill: none;
+			stroke-width: 2px;
+		}
 
-</style>
- <!-- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script> -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	</style>
+	<!-- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+</head>
 <body>
-	Input source1: <input type="text" class="source" id="source1" value="1">
-	Input source2: <input type="text" class="source" id="source2" value="1">
-	Input source3: <input type="text" class="source" id="source3" value="1">
-	<div class="chart" id="chart"></div><br>
+	<h1>Real Time Data Visualisation</h1>
+	<h2>1. Real Time Data Source Chart</h2>
+	<div id="input">
+		<!-- two column lying on left side of chart -->
+		Input source1: <input type="text" class="source" id="source1" value="1"></br>
+		Input source2: <input type="text" class="source" id="source2" value="1"></br>
+		Input source3: <input type="text" class="source" id="source3" value="1">
+	</div>
+	<div class="chart" id="chart"></div>
+	<br>
+	<h2>2. Occupancy Detection</h2>
 	<div class="chart" id="analysischart"></div>
 
 <!-- load the d3.js library -->    	
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="../static/drawchart.js"></script>
 <script>
-var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
-    'reconnection': true,
-    'reconnectionDelay': 1000,
-    'reconnectionDelayMax' : 5000,
-    'reconnectionAttempts': 5
-});
+	var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
+			'reconnection': true,
+			'reconnectionDelay': 1000,
+			'reconnectionDelayMax' : 5000,
+			'reconnectionAttempts': 5
+	});
 
-const data = [];
-// const currentIndex = 0;
-// const limit = 100;
+	const data = [];
+	// const currentIndex = 0;
+	// const limit = 100;
 
-socket.on('server_response', res => {
-    data.push(res);
-    updateData(data, true);
-});
+	socket.on('server_response', res => {
+			data.push(res);
+			updateData(data, true);
+	});
 
 </script>
 </body>
