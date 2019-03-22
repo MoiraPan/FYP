@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts-en.common.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+</head>
+
+<body>
+    <section class="hero is-primary is-bold">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Realtime Presence Detection
+                </h1>
+                <h2 class="subtitle">
+                    Change source values on the left.
+                </h2>
+            </div>
+        </div>
+    </section>
+    <main class="columns">
+        <aside class="column section">
+            <label for="s1"><b>Source 1</b><input class="input" type="number" value="1" id="s1"></label>
+            <label for="s2"><b>Source 2</b><input class="input" type="number" value="1" id="s2"></label>
+            <label for="s3"><b>Source 3</b><input class="input" type="number" value="1" id="s3"></label>
+        </aside>
+        <section class="column section is-four-fifths charts">
+            <div id="chart"></div>
+        </section>
+    </main>
+</body>
+<script src="app.js"></script>
+<script>
+        var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax' : 5000,
+                'reconnectionAttempts': 5
+        });
+    
+        const data = [];
+        // const currentIndex = 0;
+        // const limit = 50;
+    
+        socket.on("server_response", res => {
+          data.push(res);
+          updateData(data, true);
+          // analysis(data, true);
+        });
+      </script>
+
+</html>
