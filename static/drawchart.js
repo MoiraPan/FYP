@@ -10,7 +10,7 @@ var circleOpacityOnLineHover = "0.25";
 var circleRadius = 3;
 var circleRadiusHover = 6;
 
-//var color = d3.scaleOrdinal(d3.schemeCategory10);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 // set the dimensions and margins of the graph
 var margin = { top: 20, right: 20, bottom: 30, left: 50 },
@@ -143,15 +143,15 @@ function updateData(data, hasOld) {
     .style("stroke", "green")
     .style("opacity", lineOpacity);
 
-  xAxis = d3.axisBottom(x);
-  yAxis = d3.axisLeft(y);
+  xAxis = d3.axisBottom(x).ticks(10);
+  yAxis = d3.axisLeft(y).ticks(10);
 
   // Add the X Axis
   var xa = svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);
 
-  // xa.select("g").attr("marker-end", "url(#arrowhead)");
+  xa.select("g").attr("marker-end", "url(#arrowhead)");
 
   // Add the Y Axis
   var ya = svg.append("g").call(yAxis);
@@ -168,13 +168,37 @@ function updateData(data, hasOld) {
     .append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("x", margin.right)
+    .attr("x", margin.left + 50)
     .attr("y", margin.top / 2)
     .attr("dy", ".75em")
     .attr("transform", "rotate(0)")
     .text("Amplitude");
 
-  
+//     var legend = svg.selectAll(".legend")
+//     .data([newData])
+//     .enter().append("g")
+//     .attr("class", "legend")
+//     .attr("transform", function(d, i) {
+//       return "translate(0," + i * 20 + ")";
+//     });
+
+//   legend.append("rect")
+//     .attr("x", width - 18)
+//     .attr("width", 18)
+//     .attr("height", 4)
+//     .style("fill", function(d) {
+//       return color(d);
+//     });
+
+//   legend.append("text")
+//     .attr("x", width - 24)
+//     .attr("y", 6)
+//     .attr("dy", ".35em")
+//     .style("text-anchor", "end")
+//     .text(function(d) {
+//       return d;
+//     });
+
   analysis(data, true);
 }
 
@@ -308,7 +332,7 @@ function analysis(data, hasOld) {
     .append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("x", margin.right)
+    .attr("x", margin.left + 50)
     .attr("y", margin.top / 2)
     .attr("dy", ".75em")
     .attr("transform", "rotate(0)")
