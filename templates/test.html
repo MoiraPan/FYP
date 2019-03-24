@@ -2,42 +2,12 @@
 <head>
   <meta charset="utf-8" />
   <title>Indoor Occupancy Detection Visualization</title>
-  <style>
-		/* set the CSS */
-    .line {
-      fill: none;
-      stroke-width: 2px;
-    }
-
-    .chart {
-      width: 70vw;
-			float: left;
-			background-color: aliceblue;
-    }
-
-    .input {
-      float: right;
-      width: 10vw;
-      padding: 10px;
-    }
-
-    #container {
-      width: 90vw;
-      height: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-around;
-		}
-		
-		body{ background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);}
-		
-  </style>
-  <!-- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<link rel="stylesheet" type="text/css" href="../static/style.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 <body>
-  <h1 align="center">Real Time Data Visualisation</h1>
+  <h1 align="center">Indoor Occupancy Detection Visualization</h1>
 
   <div id="container">
     <h2>1. Real Time Data Source Chart</h2>
@@ -45,11 +15,11 @@
     <div id="firstchart">
       <div class="input" id="input1">
         <!-- two column lying on left side of chart -->
-        Choose SubCarrier1:
-        <input type="text" class="source" id="source1" value="1" ><br />
-        Choose SubCarrier2:
-        <input type="text" class="source" id="source2" value="1" ><br />
-        Choose SubCarrier3:
+        SubCarrier1:
+        <input type="text" class="source" id="source1" value="1" ><br>
+        SubCarrier2:
+        <input type="text" class="source" id="source2" value="1" ><br>
+        SubCarrier3:
         <input type="text" class="source" id="source3" value="1" >
       </div>
 
@@ -61,14 +31,19 @@
     <div id="secondchart">
       <div></div>
       <div class="input" id="input2">
-				Choose Data (0-2): <input type="text" id="datasource" value="0" >
+				Data Source (0-2): <br>
+				<!-- <select id="datasource">
+					<option value="0">Source 1</option>
+					<option value="1">Source 2</option>
+					<option value="2">Source 3</option>
+				</select> -->
+				<input type="text" id="datasource" value="0" >
 				<p id="alertbox"></p>
       </div>
       <div class="chart" id="chart2"></div>
     </div>
   </div>
   <!-- load the d3.js library -->
-  <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="../static/drawchart.js"></script>
   <script>
 	var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
