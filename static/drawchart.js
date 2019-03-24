@@ -14,7 +14,7 @@ var circleRadiusHover = 6;
 
 // set the dimensions and margins of the graph
 var margin = { top: 20, right: 20, bottom: 30, left: 50 },
-  width = 600 - margin.left - margin.right,
+  width = 800 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
 
 // parse the date / time
@@ -24,7 +24,7 @@ var parseTime = d3.timeParse("%H:%M:%S");
 var x = d3.scaleTime().range([0, width]);
 var y = d3.scaleLinear().range([height, 0]);
 
-// append the svg object to the body of the page
+// append the svg object to respective div of the page
 var svg = d3
   .select("#chart")
   .append("svg")
@@ -136,8 +136,7 @@ function updateData(data, hasOld) {
     .style("stroke", "steelblue")
     .style("opacity", lineOpacity);
 
-  svg
-    .append("path")
+  svg.append("path")
     .data([newData])
     .attr("class", "line")
     .attr("d", valueline3)
@@ -148,13 +147,14 @@ function updateData(data, hasOld) {
   yAxis = d3.axisLeft(y);
 
   // Add the X Axis
-  svg
-    .append("g")
+  var xa = svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);
 
+  // xa.select("g").attr("marker-end", "url(#arrowhead)");
+
   // Add the Y Axis
-  svg.append("g").call(yAxis);
+  var ya = svg.append("g").call(yAxis);
 
   svg
     .append("text")
@@ -192,9 +192,28 @@ function updateData(data, hasOld) {
 //   console.log("NewDataPoint:"+ newDataPoint)
 
 
-function analysis(newData, hasOld) {
+function analysis(data, hasOld) {
  
   var datasource = parseInt(document.getElementById("datasource").value);
+  var source1 = parseInt(document.getElementById("source1").value);
+  var source2 = parseInt(document.getElementById("source2").value);
+  var source3 = parseInt(document.getElementById("source3").value);
+
+  var subcarrier;
+
+  if (datasource == 0){
+      subcarrier = source1;
+  }
+  else if (datasource == 1){
+      subcarrier = source2;
+  }
+  else if (datasource == 2){
+      subcarrier = source3;
+  }
+  else {
+      var txt = "invalid input";
+      document.getElementById("alertbox").innerHTML = txt;
+  }
   // Removes the old chart.
   if (hasOld) {
     d3.select("#chart2 svg").remove();
@@ -203,14 +222,15 @@ function analysis(newData, hasOld) {
   // format the data
   var i = 0;
   var length = 10;
+  var inputData = data.slice(-60);
 
-  newData.forEach(function(d) {
+  inputData.forEach(function(d) {
       var range = [];
       for (j = 0; j < length; j++) {
           if (i - j < 0) {
               break;
           }
-          range[j] = newData[i - j].data[datasource][0];
+          range[j] = inputData[i - j].data[datasource][subcarrier];
       }
       d.date = parseTime(d.time);
       var vari = d3.variance(range);
@@ -220,7 +240,8 @@ function analysis(newData, hasOld) {
       d.variance = vari;
       i++;
   });
-
+  var newData = inputData.slice(-50);
+//   console.log(newData);
   // append the svg object to the body of the page
   var svg = d3
     .select("#chart2")
@@ -255,27 +276,42 @@ function analysis(newData, hasOld) {
     })
     .y(function(d) {
       return y(d.variance);
-    })
-    .curve(d3.curveMonotoneX);
+    });
 
   // Add the valueline path.
-  svg
-    .append("path")
+  svg.append("path")
     .data([newData])
     .attr("class", "line")
     .attr("d", valueline)
-    .style("stroke", "orange")
-    .style("opacity", lineOpacity);
+    .style("stroke", "red");
 
     xAxis = d3.axisBottom(x);
     yAxis = d3.axisLeft(y);
   
     // Add the X Axis
-    svg
-      .append("g")
+    svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
   
     // Add the Y Axis
     svg.append("g").call(yAxis);
+
+    svg
+    .append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height - 6)
+    .text("Time");
+
+  svg
+    .append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("x", margin.left + 20)
+    .attr("y", margin.top / 2)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(0)")
+    .text("Variance");
+
 }

@@ -3,50 +3,35 @@
   <meta charset="utf-8" />
   <title>Indoor Occupancy Detection Visualization</title>
   <style>
-    /* set the CSS */
+		/* set the CSS */
     .line {
       fill: none;
       stroke-width: 2px;
     }
 
-    .col {
-      padding: 10px;
-      margin: auto;
-      display: table-cell;
+    .chart {
+      width: 70vw;
+			float: left;
+			background-color: aliceblue;
     }
 
-    #chart {
-      width: 70%;
-      float: left;
-    }
-    #chart2 {
-      width: 70%;
-      float: left;
-    }
-    #input {
+    .input {
       float: right;
-      width: 20%;
-      padding: 10px;
-    }
-
-    #input2 {
-      float: right;
-      width: 20%;
+      width: 10vw;
       padding: 10px;
     }
 
     #container {
-      width: 80vw;
+      width: 90vw;
       height: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-around;
-    }
-
-    #secondchart {
-      width: 100%;
-    }
+		}
+		
+		body{ background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);}
+		
   </style>
   <!-- <script type="text/javascript" src="http://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
@@ -58,27 +43,28 @@
     <h2>1. Real Time Data Source Chart</h2>
 
     <div id="firstchart">
-      <div class="col" id="input">
+      <div class="input" id="input1">
         <!-- two column lying on left side of chart -->
-        Choose SubCarrier 1:
-        <input type="text" class="source" id="source1" value="1" /><br />
-        Choose SubCarrier 2:
-        <input type="text" class="source" id="source2" value="1" /><br />
-        Choose SubCarrier 3:
-        <input type="text" class="source" id="source3" value="1" />
+        Choose SubCarrier1:
+        <input type="text" class="source" id="source1" value="1" ><br />
+        Choose SubCarrier2:
+        <input type="text" class="source" id="source2" value="1" ><br />
+        Choose SubCarrier3:
+        <input type="text" class="source" id="source3" value="1" >
       </div>
 
-      <div class="col" id="chart"></div>
+      <div class="chart" id="chart"></div>
     </div>
 
     <h2>2. Occupancy Detection</h2>
 
     <div id="secondchart">
       <div></div>
-      <div class="col" id="input2">
-        Choose Data (0-2): <input type="text" id="datasource" value="0" />
+      <div class="input" id="input2">
+				Choose Data (0-2): <input type="text" id="datasource" value="0" >
+				<p id="alertbox"></p>
       </div>
-      <div class="col" id="chart2"></div>
+      <div class="chart" id="chart2"></div>
     </div>
   </div>
   <!-- load the d3.js library -->
@@ -99,7 +85,6 @@
     socket.on("server_response", res => {
       data.push(res);
       updateData(data, true);
-      // analysis(data, true);
     });
   </script>
 </body>
