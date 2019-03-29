@@ -22,7 +22,6 @@
         SubCarrier3:
         <input type="text" class="source" id="source3" value="1" >
       </div>
-
       <div class="chart" id="chart"></div>
     </div>
 
@@ -41,24 +40,15 @@
 				<p id="alertbox"></p>
       </div>
       <div class="chart" id="chart2"></div>
-    </div>
+		</div>
+		<h2>3. Occupancy Indication</h2>
+			<div class="chart" id="chart3"></div>
 	</div>
-	<defs>
-			<marker
-				id="arrowhead"
-				markerUnits="strokeWidth"
-				markerWidth="12"
-				markerHeight="12"
-				viewBox="0 0 12 12"
-				refX="6"
-				refY="6"
-				orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:black;"></path>
-			</marker>
-		</defs>
+	
   <!-- load the d3.js library -->
   <script src="../static/drawchart.js"></script>
   <script>
+
 	var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
 			'reconnection': true,
 			'reconnectionDelay': 1000,
@@ -67,12 +57,10 @@
 	});
 
     const data = [];
-    // const currentIndex = 0;
-    // const limit = 50;
-
     socket.on("server_response", res => {
       data.push(res);
-      updateData(data, true);
+			updateData(data, true);
+			// stepchart(data,true);
     });
   </script>
 </body>

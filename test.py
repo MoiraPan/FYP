@@ -9,7 +9,7 @@ from threading import Lock
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
-UDP_IP = "10.27.180.39"
+UDP_IP = "10.27.223.33"
 UDP_PORT = 6666
 time_step = 1
 starttime = time.time()
@@ -30,7 +30,6 @@ def background_thread():
         #generate
         # time.sleep(time_step - ((time.time() - starttime) % time_step))
         value = np.random.random_sample((3,114))
-        # print(value)
         s.sendto(json.dumps(value.tolist()).encode(), (UDP_IP, UDP_PORT))
 
     while True: 
@@ -38,12 +37,10 @@ def background_thread():
         t = time.strftime("%H:%M:%S")
         data, addr = s.recvfrom(16384)
         arr = json.loads(data)
-        # print(arr)
         socketio.emit('server_response',
                         {'data': arr, 'time': t},
                         namespace='/test')
  
-
 @app.route('/')
 def index():
     return render_template('test.html', async_mode=socketio.async_mode)
