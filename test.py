@@ -9,7 +9,7 @@ from threading import Lock
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
-UDP_IP = "10.27.223.33"
+UDP_IP = "192.168.1.106"
 UDP_PORT = 6666
 time_step = 1
 starttime = time.time()

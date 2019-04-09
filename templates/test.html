@@ -46,7 +46,7 @@
 	</div>
 	
   <!-- load the d3.js library -->
-  <script src="../static/drawchart.js"></script>
+  <script src="../static/drawchart2.js"></script>
   <script>
 
 	var socket = io.connect('http:' + '//' + document.domain + ':' + location.port + "/test", {
@@ -59,8 +59,8 @@
     const data = [];
     socket.on("server_response", res => {
       data.push(res);
-			updateData(data, true);
-			// stepchart(data,true);
+      updateData(data, true);
+      stepchart(data,true);
     });
   </script>
 </body>

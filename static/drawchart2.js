@@ -1,5 +1,5 @@
 //add style elements
-var lineOpacity = "0.25";
+var lineOpacity = "0.85";
 var lineOpacityHover = "0.85";
 var otherLinesOpacityHover = "0.1";
 var lineStroke = "1.5px";
@@ -43,8 +43,20 @@ var svg2 = d3
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var svg3 = d3
+  .select("#chart3")
+  .append("svg")
+  .attr("class", "chart")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var change = 0;
+var thres = 0.06;
 
 function updateData(data, hasOld) {
+
   var source1 = parseInt(document.getElementById("source1").value);
   var source2 = parseInt(document.getElementById("source2").value);
   var source3 = parseInt(document.getElementById("source3").value);
@@ -144,18 +156,35 @@ function updateData(data, hasOld) {
     .style("stroke", "green")
     .style("opacity", lineOpacity);
 
+svg.append("defs").append("marker")
+    .attr("id", "arrow")
+    .attr("viewBox","-0 -5 10 10")
+    .attr("refX", 6 + 3)
+    .attr("refY", 2)
+    .attr("markerWidth", 13)
+    .attr("markerHeight", 9)
+    .attr("orient", "auto")
+    .attr("xoverflow", "visible")
+    .append("svg:path")
+    .attr("d", "M2,2 L2,13 L8,7 L2,2")
+    .attr('fill', '#999')
+    .style('stroke','none');
+    
   xAxis = d3.axisBottom(x).ticks(10);
   yAxis = d3.axisLeft(y).ticks(10);
 
   // Add the X Axis
   var xa = svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")      
+    .style("dominant-baseline", "central")
     .call(xAxis);
-
-  xa.select("g").attr("marker-end", "url(#arrowhead)");
 
   // Add the Y Axis
   var ya = svg.append("g").call(yAxis);
+
+
+  xa.select("path").attr("marker-end", "url(#arrow)");
 
   svg
     .append("text")
@@ -203,7 +232,7 @@ function updateData(data, hasOld) {
   analysis(data, true);
 }
 
-// draw chart2
+
 
 //   const secondChartDataModel = [
 //       {
@@ -216,7 +245,7 @@ function updateData(data, hasOld) {
 //   newDataPoint.variance = 0.1
 //   console.log("NewDataPoint:"+ newDataPoint)
 
-
+// draw chart2
 function analysis(data, hasOld) {
  
   var datasource = parseInt(document.getElementById("datasource").value);
@@ -245,9 +274,10 @@ function analysis(data, hasOld) {
   }
 
   // format the data
+  var inputData = data.slice(-60);
   var i = 0;
   var length = 10;
-  var inputData = data.slice(-60);
+  var change = 0;
 
   inputData.forEach(function(d) {
       var range = [];
@@ -263,11 +293,25 @@ function analysis(data, hasOld) {
           vari = 0;
       }
       d.variance = vari;
+    //   if (d.variance > thres ){
+    //       if (change == 0){
+    //           d.stepvalue = 1;
+    //       }
+    //       else{
+    //           d.stepvalue = 0;
+    //       }
+    //       change = d.stepvalue;
+    //   }
+    //   else{
+    //     d.stepvalue = change;
+    //   }
+    //   console.log(d.stepvalue);
       i++;
   });
   var newData = inputData.slice(-50);
 //   console.log(newData);
-  // append the svg object to the body of the page
+
+  // append the svg of second chart
   var svg = d3
     .select("#chart2")
     .append("svg")
@@ -338,5 +382,142 @@ function analysis(data, hasOld) {
     .attr("dy", ".75em")
     .attr("transform", "rotate(0)")
     .text("Variance");
+
+}
+
+function stepchart(data, hasOld){
+    //get user input
+    var datasource = parseInt(document.getElementById("datasource").value);
+    var source1 = parseInt(document.getElementById("source1").value);
+    var source2 = parseInt(document.getElementById("source2").value);
+    var source3 = parseInt(document.getElementById("source3").value);
+
+    var subcarrier;
+
+    if (datasource == 0){
+        subcarrier = source1;
+    }
+    else if (datasource == 1){
+        subcarrier = source2;
+    }
+    else if (datasource == 2){
+        subcarrier = source3;
+    }
+    else {
+        var txt = "invalid input";
+        document.getElementById("alertbox").innerHTML = txt;
+    }
+
+    //process data
+    // Removes the old chart.
+  if (hasOld) {
+    d3.select("#chart3 svg").remove();
+  }
+
+  // format the data
+  var inputData = data.slice(-60);
+  var i = 0;
+  var length = 10;
+//   var change = 0;
+
+  inputData.forEach(function(d) {
+      var range = [];
+      for (j = 0; j < length; j++) {
+          if (i - j < 0) {
+              break;
+          }
+          range[j] = inputData[i - j].data[datasource][subcarrier];
+      }
+      d.date = parseTime(d.time);
+      var vari = d3.variance(range);
+      if (vari === undefined) {
+          vari = 0;
+      }
+      d.variance = vari;
+      if (change == undefined){
+          var change = 0;
+      }
+      if (d.variance > thres ){
+          if (change == 0){
+              d.stepvalue = 1;
+          }
+          else if(change == 1){
+              d.stepvalue = 0;
+          }
+        //   else {console.log(change);}
+          change = d.stepvalue;
+      }
+      else{
+        d.stepvalue = change;
+      }
+      console.log(d.stepvalue);
+      i++;
+  });
+  var newData = inputData.slice(-50);
+
+//append the 3rd step chart
+  var svg = d3
+    .select("#chart3")
+    .append("svg")
+    .datum(newData)
+    .attr("class", "chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+//Scale the range of the data
+  x.domain(
+    d3.extent(newData, function(d) {
+      return d.date;
+    })
+  );
+  y.domain([0,2]);
+
+  // define the line
+  var valueline = d3
+    .line()
+    .x(function(d) {
+      return x(d.date);
+    })
+    .y(function(d) {
+      return y(d.stepvalue);
+    });
+
+  // Add the valueline path.
+  svg.append("path")
+    .data([newData])
+    .attr("class", "line")
+    .attr("d", valueline)
+    .style("stroke", "red");
+
+    xAxis = d3.axisBottom(x);
+    yAxis = d3.axisLeft(y);
+  
+    // Add the X Axis
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+  
+    // Add the Y Axis
+    svg.append("g").call(yAxis);
+
+    svg
+    .append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height - 6)
+    .text("Time");
+
+  svg
+    .append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("x", margin.left + 50)
+    .attr("y", margin.top / 2)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(0)")
+    .text("Occupied");
 
 }
