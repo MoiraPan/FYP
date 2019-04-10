@@ -10,8 +10,8 @@ from threading import Lock
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
-UDP_IP = "10.27.3.18"
-UDP_PORT = 31500
+UDP_IP = "192.168.1.106"
+UDP_PORT = 6666
 time_step = 1
 starttime = time.time()
  
@@ -22,7 +22,6 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
-# array = np.empty((3,114))
 subcarrier = 0
 # generate and send data
 def background_thread():
@@ -30,10 +29,12 @@ def background_thread():
     s.bind((UDP_IP, UDP_PORT))
 
     mat = scipy.io.loadmat('1.mat')
+    matamp = np.transpose(mat['CSIamp'])
+    matamp = matamp.reshape(300,3,114)
     # udp send, send one file data every time
-    for msg in mat['CSIamp'][subcarrier]:
-        s.sendto(json.dumps(msg).encode(), (UDP_IP, UDP_PORT))
-        print (msg)
+    for msg in matamp:
+        s.sendto(json.dumps(msg.tolist()).encode(), (UDP_IP, UDP_PORT))
+        # print (msg)
     # for t in range(24 * 3600 // time_step):
     # # while True:
     #     #generate
@@ -46,9 +47,15 @@ def background_thread():
         t = time.strftime("%H:%M:%S")
         data, addr = s.recvfrom(16384)
         arr = json.loads(data)
-        # print(data)
-        # data = data.decode('unicode_escape').encode('utf-8') #bytes type
-        print(arr)
+        
+        # for i in range (3):
+        #     array.append([])
+        #     for j in range (5):
+        #         data, addr = s.recvfrom(16384)
+        #         arr = json.loads(data)
+        #         # print(arr)
+        #         array[i].append(arr)
+
         socketio.emit('server_response',
                         {'data': arr, 'time': t},
                         namespace='/test')

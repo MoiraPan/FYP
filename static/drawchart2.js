@@ -53,7 +53,7 @@ var svg3 = d3
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var change = 0;
-var thres = 0.06;
+var thres = 5;
 
 function updateData(data, hasOld) {
 
@@ -75,6 +75,7 @@ function updateData(data, hasOld) {
     d.value2 = +d.data[1][source2];
     d.value3 = +d.data[2][source3];
     d.max = Math.max(d.value1, d.value2, d.value3);
+    d.min = Math.min(d.value1, d.value2, d.value3);
   });
 
   // append the svg object to the body of the page
@@ -95,7 +96,9 @@ function updateData(data, hasOld) {
     })
   );
   y.domain([
-    0,
+    d3.min(newData, function(d) {
+      return d.min;
+    }),
     d3.max(newData, function(d) {
       return d.max;
     })
@@ -438,17 +441,18 @@ function stepchart(data, hasOld){
           var change = 0;
       }
       if (d.variance > thres ){
-          if (change == 0){
-              d.stepvalue = 1;
-          }
-          else if(change == 1){
-              d.stepvalue = 0;
-          }
-        //   else {console.log(change);}
-          change = d.stepvalue;
+        d.stepvalue = 1;
+        //   if (change == 0){
+        //       d.stepvalue = 1;
+        //   }
+        //   else if(change == 1){
+        //       d.stepvalue = 0;
+        //   }
+        // //   else {console.log(change);}
+        //   change = d.stepvalue;
       }
       else{
-        d.stepvalue = change;
+        d.stepvalue = 0;
       }
       console.log(d.stepvalue);
       i++;
