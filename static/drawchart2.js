@@ -53,7 +53,7 @@ var svg3 = d3
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var change = 0;
-var thres = 5;
+var thres = 20;
 
 function updateData(data, hasOld) {
 
@@ -437,11 +437,12 @@ function stepchart(data, hasOld){
           vari = 0;
       }
       d.variance = vari;
+      console.log(d.variance);
       if (change == undefined){
           var change = 0;
       }
-      if (d.variance > thres ){
-        d.stepvalue = 1;
+      if (d.variance < thres ){
+        d.stepvalue = 0;
         //   if (change == 0){
         //       d.stepvalue = 1;
         //   }
@@ -452,9 +453,9 @@ function stepchart(data, hasOld){
         //   change = d.stepvalue;
       }
       else{
-        d.stepvalue = 0;
+        d.stepvalue = 1;
       }
-      console.log(d.stepvalue);
+      // console.log(d.stepvalue);
       i++;
   });
   var newData = inputData.slice(-50);

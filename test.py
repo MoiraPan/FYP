@@ -28,7 +28,7 @@ def background_thread():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     s.bind((UDP_IP, UDP_PORT))
 
-    mat = scipy.io.loadmat('1.mat')
+    mat = scipy.io.loadmat('3.mat')
     matamp = np.transpose(mat['CSIamp'])
     matamp = matamp.reshape(300,3,114)
     # udp send, send one file data every time
